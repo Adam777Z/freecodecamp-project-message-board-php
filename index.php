@@ -399,6 +399,8 @@ if ( isset( $_SERVER['PATH_INFO'] ) ) {
 				&&
 				is_array( $data['replies'][ count( $data['replies'] ) - 1 ] )
 				&&
+				isset( $data['replies'][ count( $data['replies'] ) - 1 ]['id'] )
+				&&
 				isset( $data['replies'][ count( $data['replies'] ) - 1 ]['text'] )
 				&&
 				$data['replies'][ count( $data['replies'] ) - 1 ]['text'] == 'Reply'
@@ -416,7 +418,7 @@ if ( isset( $_SERVER['PATH_INFO'] ) ) {
 				! isset( $data['reported'] )
 			),
 		];
-		$id3 = count( $data['replies'] ) - 1;
+		$id3 = $data['replies'][ count( $data['replies'] ) - 1 ]['id'];
 
 		$send_data = [
 			'thread_id' => $id2,
@@ -523,7 +525,7 @@ function post_api_data( $path, $data, $method = 'POST' ) {
 	return $return;
 }
 
-function get_board_threads( $board, $limit = false ) {
+function get_board_threads( $board, $limit = false, $replies_reversed = true ) {
 	global $db;
 
 	$query = "SELECT * FROM messageboard WHERE board = {$db->quote( $board )} ORDER BY bumped_on DESC";
@@ -542,6 +544,10 @@ function get_board_threads( $board, $limit = false ) {
 
 			$result[$key]['replies'] = json_decode( $result[$key]['replies'], true );
 
+			if ( $replies_reversed ) {
+				$result[$key]['replies'] = array_reverse( $result[$key]['replies'] );
+			}
+
 			$result[$key]['replycount'] = count( $result[$key]['replies'] );
 
 			if ( $result[$key]['replycount'] > 3 ) {
@@ -549,7 +555,6 @@ function get_board_threads( $board, $limit = false ) {
 			}
 
 			foreach ( $result[$key]['replies'] as $key2 => $value2 ) {
-				// $result[$key]['replies'][$key2] = array_merge( [ 'id' => $key2 ], $result[$key]['replies'][$key2] );
 				unset( $result[$key]['replies'][$key2]['delete_password'] );
 				unset( $result[$key]['replies'][$key2]['reported'] );
 			}
@@ -559,31 +564,34 @@ function get_board_threads( $board, $limit = false ) {
 	return $result ? $result : [];
 }
 
-function get_thread( $thread_id, $limit = false, $all = false ) {
+function get_thread( $thread_id, $limit = false, $replies_reversed = true, $all = false ) {
 	global $db;
 
 	$query = $db->query( "SELECT * FROM messageboard WHERE id = {$db->quote( $thread_id )} ORDER BY created_on DESC" );
 	$result = $query->fetchAll( PDO::FETCH_ASSOC );
 
 	if ( $result ) {
-		foreach ( $result as $key => $value ) {
-			$result[$key]['replies'] = json_decode( $result[$key]['replies'], true );
+		$key = 0;
 
-			$result[$key]['replycount'] = count( $result[$key]['replies'] );
+		$result[$key]['replies'] = json_decode( $result[$key]['replies'], true );
 
-			if ( $limit && $result[$key]['replycount'] > $limit ) {
-				$result[$key]['replies'] = array_slice( $result[$key]['replies'], 0, $limit );
-			}
+		if ( $replies_reversed ) {
+			$result[$key]['replies'] = array_reverse( $result[$key]['replies'] );
+		}
 
-			if ( ! $all ) {
-				unset( $result[$key]['delete_password'] );
-				unset( $result[$key]['reported'] );
+		$result[$key]['replycount'] = count( $result[$key]['replies'] );
 
-				foreach ( $result[$key]['replies'] as $key2 => $value2 ) {
-					// $result[$key]['replies'][$key2] = array_merge( [ 'id' => $key2 ], $result[$key]['replies'][$key2] );
-					unset( $result[$key]['replies'][$key2]['delete_password'] );
-					unset( $result[$key]['replies'][$key2]['reported'] );
-				}
+		if ( $limit && $result[$key]['replycount'] > $limit ) {
+			$result[$key]['replies'] = array_slice( $result[$key]['replies'], 0, $limit );
+		}
+
+		if ( ! $all ) {
+			unset( $result[$key]['delete_password'] );
+			unset( $result[$key]['reported'] );
+
+			foreach ( $result[$key]['replies'] as $key2 => $value2 ) {
+				unset( $result[$key]['replies'][$key2]['delete_password'] );
+				unset( $result[$key]['replies'][$key2]['reported'] );
 			}
 		}
 	}
@@ -636,13 +644,17 @@ function delete_thread( $thread_id, $delete_password ) {
 function add_reply( $thread_id, $text, $delete_password ) {
 	global $db;
 
-	$thread = get_thread( $thread_id, false, true );
+	$thread = get_thread( $thread_id, false, false, true );
 
 	if ( $thread ) {
 		$date = date_create( 'now', timezone_open( 'UTC' ) );
 		$date = date_format( $date, 'Y-m-d\\TH:i:s.vP' );
 
+		// $reply_id = count( $thread['replies'] ) > 0 ? $thread['replies'][ count( $thread['replies'] ) - 1 ]['id'] + 1 : 1;
+		$reply_id = count( $thread['replies'] ) + 1;
+
 		$thread['replies'][] = [
+			'id' => $reply_id,
 			'text' => $text,
 			'delete_password' => $delete_password,
 			'created_on' => $date,
@@ -664,39 +676,47 @@ function add_reply( $thread_id, $text, $delete_password ) {
 function report_reply( $thread_id, $reply_id ) {
 	global $db;
 
-	$thread = get_thread( $thread_id, false, true );
+	$thread = get_thread( $thread_id, false, false, true );
 
 	if ( $thread ) {
-		$thread['replies'][$reply_id]['reported'] = (int) true;
+		foreach ( $thread['replies'] as $key => $value ) {
+			if ( $thread['replies'][$key]['id'] == $reply_id ) {
+				$thread['replies'][$key]['reported'] = (int) true;
 
-		$data = [
-			'id' => (int) $thread_id,
-			'replies' => json_encode( $thread['replies'] ),
-		];
-		$sth = $db->prepare( 'UPDATE messageboard SET replies = :replies WHERE id = :id' );
-		return $sth->execute( $data );
-	} else {
-		return false;
+				$data = [
+					'id' => (int) $thread_id,
+					'replies' => json_encode( $thread['replies'] ),
+				];
+				$sth = $db->prepare( 'UPDATE messageboard SET replies = :replies WHERE id = :id' );
+				return $sth->execute( $data );
+			}
+		}
 	}
+
+	return false;
 }
 
 function delete_reply( $thread_id, $reply_id, $delete_password ) {
 	global $db;
 
-	$thread = get_thread( $thread_id, false, true );
+	$thread = get_thread( $thread_id, false, false, true );
 
-	if ( $thread && $thread['replies'][$reply_id]['delete_password'] == $delete_password ) {
-		$thread['replies'][$reply_id]['text'] = '[deleted]';
+	if ( $thread ) {
+		foreach ( $thread['replies'] as $key => $value ) {
+			if ( $thread['replies'][$key]['id'] == $reply_id && $thread['replies'][$key]['delete_password'] == $delete_password ) {
+				$thread['replies'][$key]['text'] = '[deleted]';
 
-		$data = [
-			'id' => (int) $thread_id,
-			'replies' => json_encode( $thread['replies'] ),
-		];
-		$sth = $db->prepare( 'UPDATE messageboard SET replies = :replies WHERE id = :id' );
-		return $sth->execute( $data );
-	} else {
-		return false;
+				$data = [
+					'id' => (int) $thread_id,
+					'replies' => json_encode( $thread['replies'] ),
+				];
+				$sth = $db->prepare( 'UPDATE messageboard SET replies = :replies WHERE id = :id' );
+				return $sth->execute( $data );
+			}
+		}
 	}
+
+	return false;
 }
 ?><!DOCTYPE html>
 <html lang="en">

@@ -44,7 +44,6 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 		}
 	} else if ( document.querySelector( '#board-title' ) !== null ) {
 		let path = window.location.pathname.match( /(\/.*)*\/b\/([A-Za-z0-9]+)\/?$/ );
-		// var path_prefix = window.location.pathname.replace( /(\/.*)*\/b\/([A-Za-z0-9]+)\/?$/, '$1/' );
 		var path_prefix = path[1] + '/';
 		var board = path[2];
 		var url = `${path_prefix}api/threads/${board}?limit=0`;
@@ -79,9 +78,7 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 
 				html += `<p class="card-text">${thread['replycount']} replies total (${hiddenCount} hidden) - <a href="${path_prefix}b/${board}/${thread['id']}">See the full thread here</a>.</p>`;
 
-				thread['replies'].forEach( ( reply, index ) => {
-					reply['id'] = index;
-
+				thread['replies'].forEach( ( reply ) => {
 					html += `
 							<div class="card reply mb-2">
 								<div class="card-body">
@@ -236,9 +233,7 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 					<div class="replies">
 			`;
 
-			thread['replies'].forEach( ( reply, index ) => {
-				reply['id'] = index;
-
+			thread['replies'].forEach( ( reply ) => {
 				html += `
 						<div class="card reply mb-2">
 							<div class="card-body">

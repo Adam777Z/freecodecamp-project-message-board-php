@@ -539,6 +539,8 @@ function get_board_threads( $board, $limit = false, $replies_reversed = true ) {
 
 	if ( $result ) {
 		foreach ( $result as $key => $value ) {
+			$result[$key]['id'] = (int) $result[$key]['id'];
+
 			unset( $result[$key]['delete_password'] );
 			unset( $result[$key]['reported'] );
 
@@ -572,6 +574,8 @@ function get_thread( $thread_id, $limit = false, $replies_reversed = true, $all 
 
 	if ( $result ) {
 		$key = 0;
+
+		$result[$key]['id'] = (int) $result[$key]['id'];
 
 		$result[$key]['replies'] = json_decode( $result[$key]['replies'], true );
 

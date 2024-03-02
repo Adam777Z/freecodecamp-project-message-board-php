@@ -102,7 +102,7 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 											<form class="board-form d-flex" action="${path_prefix}api/replies/${board}" method="delete">
 												<input type="hidden" name="thread_id" value="${thread['id']}" required>
 												<input type="hidden" name="reply_id" value="${reply['id']}" required>
-												<input class="form-control me-2" type="text" name="delete_password" placeholder="Password to delete" required>
+												<input class="form-control me-2" type="text" name="delete_password" placeholder="Password to delete" autocomplete="off" required>
 												<input class="btn btn-danger" type="submit" value="Delete reply">
 											</form>
 										</div>
@@ -117,7 +117,7 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 								<form class="text-center" action="${path_prefix}api/replies/${board}" method="post">
 									<input type="hidden" name="thread_id" value="${thread['id']}">
 									<textarea class="form-control mb-2" rows="5" cols="80" name="text" placeholder="Quick reply..." required></textarea>
-									<input class="form-control mb-2" type="text" name="delete_password" placeholder="Password to delete" required>
+									<input class="form-control mb-2" type="text" name="delete_password" placeholder="Password to delete" autocomplete="off" required>
 									<input class="btn btn-primary" type="submit" value="Submit">
 								</form>
 							</div>
@@ -136,7 +136,7 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 								</form>
 								<form class="board-form d-flex" action="${path_prefix}api/threads/${board}" method="delete">
 									<input type="hidden" name="thread_id" value="${thread['id']}" required>
-									<input class="form-control me-2" type="text" name="delete_password" placeholder="Password to delete" required>
+									<input class="form-control me-2" type="text" name="delete_password" placeholder="Password to delete" autocomplete="off" required>
 									<input class="btn btn-danger" type="submit" value="Delete thread">
 								</form>
 							</div>
@@ -259,7 +259,7 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 										<form class="board-form d-flex" action="${path_prefix}api/replies/${board}" method="delete">
 											<input type="hidden" name="thread_id" value="${thread['id']}" required>
 											<input type="hidden" name="reply_id" value="${reply['id']}" required>
-											<input class="form-control me-2" type="text" name="delete_password" placeholder="Password to delete" required>
+											<input class="form-control me-2" type="text" name="delete_password" placeholder="Password to delete" autocomplete="off" required>
 											<input class="btn btn-danger" type="submit" value="Delete reply">
 										</form>
 									</div>
@@ -274,7 +274,7 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 							<form class="text-center" action="${path_prefix}api/replies/${board}" method="post">
 								<input type="hidden" name="thread_id" value="${thread['id']}">
 								<textarea class="form-control mb-2" rows="5" cols="80" name="text" placeholder="Quick reply..." required></textarea>
-								<input class="form-control mb-2" type="text" name="delete_password" placeholder="Password to delete" required>
+								<input class="form-control mb-2" type="text" name="delete_password" placeholder="Password to delete" autocomplete="off" required>
 								<input class="btn btn-primary" type="submit" value="Submit">
 							</form>
 						</div>
@@ -293,7 +293,7 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 							</form>
 							<form class="board-form d-flex" action="${path_prefix}api/threads/${board}" method="delete">
 								<input type="hidden" name="thread_id" value="${thread['id']}" required>
-								<input class="form-control me-2" type="text" name="delete_password" placeholder="Password to delete" required>
+								<input class="form-control me-2" type="text" name="delete_password" placeholder="Password to delete" autocomplete="off" required>
 								<input class="btn btn-danger" type="submit" value="Delete thread">
 							</form>
 						</div>

@@ -731,7 +731,7 @@ function delete_reply( $thread_id, $reply_id, $delete_password ) {
 							<h3>Add a new thread:</h3>
 							<form id="new-thread" class="text-center" action="<?php echo $path_prefix; ?>api/" method="post">
 								<textarea class="form-control mb-2" rows="8" cols="120" name="text" placeholder="Thread text..." required></textarea>
-								<input class="form-control mb-2" type="text" name="delete_password" placeholder="Password to delete" required>
+								<input class="form-control mb-2" type="text" name="delete_password" placeholder="Password to delete" autocomplete="off" required>
 								<input class="btn btn-primary" type="submit" value="Submit">
 							</form>
 						</div>
@@ -803,7 +803,7 @@ function delete_reply( $thread_id, $reply_id, $delete_password ) {
 								<form class="test-form-new" action="<?php echo $path_prefix; ?>api/threads/" method="post">
 									<input type="text" class="form-control mb-2" name="board" placeholder="Board" required>
 									<textarea class="form-control mb-2" name="text" placeholder="Thread text..." required></textarea>
-									<input type="text" class="form-control mb-2" name="delete_password" placeholder="Password to delete" required>
+									<input type="text" class="form-control mb-2" name="delete_password" placeholder="Password to delete" autocomplete="off" required>
 									<input type="submit" class="btn btn-primary" value="Submit">
 								</form>
 							</div>
@@ -822,7 +822,7 @@ function delete_reply( $thread_id, $reply_id, $delete_password ) {
 								<form class="test-form" action="<?php echo $path_prefix; ?>api/threads/" method="delete">
 									<input type="text" class="form-control mb-2" name="board" placeholder="Board" required>
 									<input type="text" class="form-control mb-2" name="thread_id" placeholder="ID of thread to delete" required>
-									<input type="text" class="form-control mb-2" name="delete_password" placeholder="Password to delete" required>
+									<input type="text" class="form-control mb-2" name="delete_password" placeholder="Password to delete" autocomplete="off" required>
 									<input type="submit" class="btn btn-danger" value="Submit">
 								</form>
 							</div>
@@ -838,7 +838,7 @@ function delete_reply( $thread_id, $reply_id, $delete_password ) {
 									<input type="text" class="form-control mb-2" name="board" placeholder="Board" required>
 									<input type="text" class="form-control mb-2" name="thread_id" placeholder="Thread ID" required>
 									<textarea class="form-control mb-2" name="text" placeholder="Reply text..." required></textarea>
-									<input type="text" class="form-control mb-2" name="delete_password" placeholder="Password to delete" required>
+									<input type="text" class="form-control mb-2" name="delete_password" placeholder="Password to delete" autocomplete="off" required>
 									<input type="submit" class="btn btn-primary" value="Submit">
 								</form>
 							</div>
@@ -859,7 +859,7 @@ function delete_reply( $thread_id, $reply_id, $delete_password ) {
 									<input type="text" class="form-control mb-2" name="board" placeholder="Board" required>
 									<input type="text" class="form-control mb-2" name="thread_id" placeholder="Thread ID" required>
 									<input type="text" class="form-control mb-2" name="reply_id" placeholder="ID of reply to delete" required>
-									<input type="text" class="form-control mb-2" name="delete_password" placeholder="Password to delete" required>
+									<input type="text" class="form-control mb-2" name="delete_password" placeholder="Password to delete" autocomplete="off" required>
 									<input type="submit" class="btn btn-danger" value="Submit">
 								</form>
 							</div>

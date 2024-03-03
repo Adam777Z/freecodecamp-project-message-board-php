@@ -111,7 +111,7 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 
 				html += `
 							<div class="mt-3">
-								<form class="text-center" action="${path_prefix}api/replies/${board}" method="post">
+								<form class="board-form text-center" action="${path_prefix}api/replies/${board}" method="post">
 									<input type="hidden" name="thread_id" value="${thread['id']}">
 									<textarea class="form-control mb-2" rows="5" cols="80" name="text" placeholder="Quick reply..." required></textarea>
 									<input class="form-control mb-2" type="text" name="delete_password" placeholder="Password to delete" autocomplete="off" required>
@@ -150,43 +150,38 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 		} );
 
 		document.querySelector( '#new-thread' ).addEventListener( 'submit', ( event2 ) => {
-			event2.target.setAttribute( 'action', `${path_prefix}api/threads/${board}` );
-		} );
+			event2.preventDefault();
 
-		document.querySelector( '#board-display' ).addEventListener( 'submit', ( event2 ) => {
-			if ( event2.target.closest( '.board-form' ) ) {
-				event2.preventDefault();
+			let url = event2.target.getAttribute( 'action' );
 
-				let url = event2.target.closest( '.board-form' ).getAttribute( 'action' );
+			fetch( url, {
+				'method': event2.target.getAttribute( 'method' ).toUpperCase(),
+				'body': new URLSearchParams( new FormData( event2.target ) ),
+			} )
+			.then( ( response ) => {
+				if ( response['ok'] ) {
+					return response.text();
+				} else {
+					throw 'Error';
+				}
+			} )
+			.then( ( data ) => {
+				try {
+					data = JSON.parse( data );
+				} catch ( error ) {
+					// console.log( error );
+				}
 
-				fetch( url, {
-					'method': event2.target.closest( '.board-form' ).getAttribute( 'method' ).toUpperCase(),
-					'body': new URLSearchParams( new FormData( event2.target.closest( '.board-form' ) ) ),
-				} )
-				.then( ( response ) => {
-					if ( response['ok'] ) {
-						return response.text();
-					} else {
-						throw 'Error';
-					}
-				} )
-				.then( ( data ) => {
-					try {
-						data = JSON.parse( data );
-					} catch ( error ) {
-						// console.log( error );
-					}
-
-					alert( data['error'] !== undefined ? data['error'] : data['result'] );
-
-					if ( data['result'] == 'Successfully deleted' && ( event2.submitter.value == 'Delete reply' || event2.submitter.value == 'Delete thread' ) ) {
-						window.location.reload();
-					}
-				} )
-				.catch( ( error ) => {
-					console.log( error );
-				} );
-			}
+				if ( data['error'] !== undefined ) {
+					alert( data['error'] );
+				} else {
+					event2.target.reset();
+					window.location.reload();
+				}
+			} )
+			.catch( ( error ) => {
+				console.log( error );
+			} );
 		} );
 	} else if ( document.querySelector( '#thread-title' ) !== null ) {
 		let path = window.location.pathname.match( /(\/.*)*\/b\/([A-Za-z0-9]+)\/([A-Za-z0-9]+)\/?$/ );
@@ -266,7 +261,7 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 
 			html += `
 						<div class="mt-3">
-							<form class="text-center" action="${path_prefix}api/replies/${board}" method="post">
+							<form class="board-form text-center" action="${path_prefix}api/replies/${board}" method="post">
 								<input type="hidden" name="thread_id" value="${thread['id']}">
 								<textarea class="form-control mb-2" rows="5" cols="80" name="text" placeholder="Quick reply..." required></textarea>
 								<input class="form-control mb-2" type="text" name="delete_password" placeholder="Password to delete" autocomplete="off" required>
@@ -302,15 +297,18 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 		.catch( ( error ) => {
 			console.log( error );
 		} );
+	}
 
+	if ( document.querySelector( '#board-display' ) !== null ) {
 		document.querySelector( '#board-display' ).addEventListener( 'submit', ( event2 ) => {
 			if ( event2.target.closest( '.board-form' ) ) {
 				event2.preventDefault();
 
 				let url = event2.target.closest( '.board-form' ).getAttribute( 'action' );
+				let method = event2.target.closest( '.board-form' ).getAttribute( 'method' ).toUpperCase();
 
 				fetch( url, {
-					'method': event2.target.closest( '.board-form' ).getAttribute( 'method' ).toUpperCase(),
+					'method': method,
 					'body': new URLSearchParams( new FormData( event2.target.closest( '.board-form' ) ) ),
 				} )
 				.then( ( response ) => {
@@ -327,10 +325,17 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 						// console.log( error );
 					}
 
-					alert( data['error'] !== undefined ? data['error'] : data['result'] );
-
-					if ( data['result'] == 'Successfully deleted' && ( event2.submitter.value == 'Delete reply' || event2.submitter.value == 'Delete thread' ) ) {
+					if ( url.toLowerCase().includes( 'api/replies' ) && method == 'POST' && data['id'] !== undefined ) {
+						let thread_id = data['id'];
+						// Redirect to thread
+						window.location.href = `${path_prefix}b/${board}/${thread_id}`;
+						return;
+					// } else if ( data['result'] !== undefined && data['result'] == 'Successfully deleted' && ( event2.submitter.value == 'Delete reply' || event2.submitter.value == 'Delete thread' ) ) {
+					} else if ( event2.submitter.value.toLowerCase().includes( 'delete' ) && method == 'DELETE' && data['result'] !== undefined && data['result'] == 'Successfully deleted' ) {
+						alert( data['error'] !== undefined ? data['error'] : data['result'] );
 						window.location.reload();
+					} else {
+						alert( data['error'] !== undefined ? data['error'] : data['result'] );
 					}
 				} )
 				.catch( ( error ) => {

@@ -59,7 +59,8 @@ if ( isset( $_SERVER['PATH_INFO'] ) ) {
 			$delete_password = $_POST['delete_password'];
 
 			if ( add_thread( $board, $text, $delete_password ) ) {
-				header( "Location: {$path_prefix}b/{$board}" );
+				header( 'Content-Type: application/json; charset=utf-8' );
+				echo json_encode( get_thread( $db->lastInsertId() ) );
 				exit;
 			} else {
 				header( 'Content-Type: application/json; charset=utf-8' );
@@ -174,7 +175,8 @@ if ( isset( $_SERVER['PATH_INFO'] ) ) {
 			$delete_password = $_POST['delete_password'];
 
 			if ( add_reply( $thread_id, $text, $delete_password ) ) {
-				header( "Location: {$path_prefix}b/{$board}/{$thread_id}" );
+				header( 'Content-Type: application/json; charset=utf-8' );
+				echo json_encode( get_thread( $thread_id ) );
 				exit;
 			} else {
 				header( 'Content-Type: application/json; charset=utf-8' );
@@ -194,7 +196,6 @@ if ( isset( $_SERVER['PATH_INFO'] ) ) {
 				] );
 				exit;
 			}
-
 
 			if ( empty( $data['reply_id'] ) && $data['reply_id'] !== '0' ) {
 				header( 'Content-Type: application/json; charset=utf-8' );
@@ -753,7 +754,7 @@ function delete_reply( $thread_id, $reply_id, $delete_password ) {
 
 						<div id="add-new-thread" class="mb-3">
 							<h3>Add a new thread:</h3>
-							<form id="new-thread" class="text-center" action="<?php echo $path_prefix; ?>api/" method="post">
+							<form id="new-thread" class="text-center" action="<?php echo $path_prefix; ?>api/threads/<?php echo $board; ?>" method="post">
 								<textarea class="form-control mb-2" rows="8" cols="120" name="text" placeholder="Thread text..." required></textarea>
 								<input class="form-control mb-2" type="text" name="delete_password" placeholder="Password to delete" autocomplete="off" required>
 								<input class="btn btn-primary" type="submit" value="Submit">
@@ -765,9 +766,11 @@ function delete_reply( $thread_id, $reply_id, $delete_password ) {
 					<div id="user-stories">
 						<h3>User Stories:</h3>
 						<ol>
-							<li>I can <b>POST</b> a thread to a specific message board by passing form data <code>text</code> and <code>delete_password</code> to <i>/api/threads/{board}</i>. (Recommended: redirect to board page /b/{board})<br>
+							<li>I can <b>POST</b> a thread to a specific message board by passing form data <code>text</code> and <code>delete_password</code> to <i>/api/threads/{board}</i>.<br>
+								(Recommended: redirect to board page /b/{board})<br>
 								Saved will be <code>id</code>, <code>text</code>, <code>created_on</code> (date &amp; time), <code>bumped_on</code> (date &amp; time, starts same as <code>created_on</code>), <code>reported</code> (boolean), <code>delete_password</code>, &amp; <code>replies</code> (array).</li>
-							<li>I can <b>POST</b> a reply to a thread on a specific board by passing form data <code>text</code>, <code>delete_password</code>, &amp; <code>thread_id</code> to <i>/api/replies/{board}</i> and it will also update the <code>bumped_on</code> date to the comment's date. (Recommended: redirect to thread page /b/{board}/{thread_id})<br>
+							<li>I can <b>POST</b> a reply to a thread on a specific board by passing form data <code>text</code>, <code>delete_password</code>, &amp; <code>thread_id</code> to <i>/api/replies/{board}</i> and it will also update the <code>bumped_on</code> date to the comment's date.<br>
+								(Recommended: redirect to thread page /b/{board}/{thread_id})<br>
 								In the thread's 'replies' array will be saved <code>id</code>, <code>text</code>, <code>created_on</code>, <code>delete_password</code>, &amp; <code>reported</code>.</li>
 							<li>I can <b>GET</b> an array of the most recent 10 bumped threads on the board with only the most recent 3 replies from <i>/api/threads/{board}</i>. The <code>reported</code> and <code>delete_password</code> fields will not be sent. Also include <code>replycount</code> (total number of replies).</li>
 							<li>I can <b>GET</b> an entire thread with all its replies from <i>/api/replies/{board}?thread_id={thread_id}</i>. Also hiding the same fields (<code>reported</code> and <code>delete_password</code>).</li>

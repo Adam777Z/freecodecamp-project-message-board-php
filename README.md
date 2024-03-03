@@ -5,9 +5,11 @@
 
 ### User Stories:
 
-1. I can **POST** a thread to a specific message board by passing form data `text` and `delete_password` to _/api/threads/{board}_. (Recommended: redirect to board page /b/{board})\
+1. I can **POST** a thread to a specific message board by passing form data `text` and `delete_password` to _/api/threads/{board}_.\
+	(Recommended: redirect to board page /b/{board})\
 	Saved will be `id`, `text`, `created_on` (date & time), `bumped_on` (date & time, starts same as `created_on`), `reported` (boolean), `delete_password`, & `replies` (array).
-2. I can **POST** a reply to a thread on a specific board by passing form data `text`, `delete_password`, & `thread_id` to _/api/replies/{board}_ and it will also update the `bumped_on` date to the comment's date. (Recommended: redirect to thread page /b/{board}/{thread\_id})\
+2. I can **POST** a reply to a thread on a specific board by passing form data `text`, `delete_password`, & `thread_id` to _/api/replies/{board}_ and it will also update the `bumped_on` date to the comment's date.\
+	(Recommended: redirect to thread page /b/{board}/{thread\_id})\
 	In the thread's 'replies' array will be saved `id`, `text`, `created_on`, `delete_password`, & `reported`.
 3. I can **GET** an array of the most recent 10 bumped threads on the board with only the most recent 3 replies from _/api/threads/{board}_. The `reported` and `delete_password` fields will not be sent. Also include `replycount` (total number of replies).
 4. I can **GET** an entire thread with all its replies from _/api/replies/{board}?thread\_id={thread\_id}_. Also hiding the same fields (`reported` and `delete_password`).

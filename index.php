@@ -33,7 +33,7 @@ if ( isset( $_SERVER['PATH_INFO'] ) ) {
 		$thread = isset( $matches[2] ) ? $matches[2] : '';
 	} elseif ( strpos( $_SERVER['PATH_INFO'], '/api/threads' ) !== false ) {
 		if ( $_SERVER['REQUEST_METHOD'] == 'GET' ) {
-			$limit = isset( $_GET['limit'] ) && ! empty( $_GET['limit'] ) && is_numeric( $_GET['limit'] ) ? (int) $_GET['limit'] : 10;
+			$limit = isset( $_GET['limit'] ) && ( ! empty( $_GET['limit'] ) || $_GET['limit'] === '0' ) && is_numeric( $_GET['limit'] ) ? (int) $_GET['limit'] : 10;
 
 			header( 'Content-Type: application/json; charset=utf-8' );
 			echo json_encode( get_board_threads( $board, $limit ) );

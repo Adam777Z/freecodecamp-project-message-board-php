@@ -51,41 +51,6 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 		document.querySelector( '#board-title' ).innerHTML = `Welcome to <a href="${path_prefix}">/</a><a href="${path_prefix}b/${board}">b/${board}</a>`;
 
 		load_thread_data();
-
-		document.querySelector( '#new-thread' ).addEventListener( 'submit', ( event2 ) => {
-			event2.preventDefault();
-
-			let url = event2.target.getAttribute( 'action' );
-
-			fetch( url, {
-				'method': event2.target.getAttribute( 'method' ).toUpperCase(),
-				'body': new URLSearchParams( new FormData( event2.target ) ),
-			} )
-			.then( ( response ) => {
-				if ( response['ok'] ) {
-					return response.text();
-				} else {
-					throw 'Error';
-				}
-			} )
-			.then( ( data ) => {
-				try {
-					data = JSON.parse( data );
-				} catch ( error ) {
-					// console.log( error );
-				}
-
-				if ( data['error'] !== undefined ) {
-					alert( data['error'] );
-				} else {
-					event2.target.reset();
-					load_thread_data();
-				}
-			} )
-			.catch( ( error ) => {
-				console.log( error );
-			} );
-		} );
 	} else if ( document.querySelector( '#thread-title' ) !== null ) {
 		let path = window.location.pathname.match( /(\/.*)*\/b\/([A-Za-z0-9]+)\/([A-Za-z0-9]+)\/?$/ );
 		var path_prefix = path[1] + '/';
@@ -98,8 +63,8 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 		load_thread_data();
 	}
 
-	if ( document.querySelector( '#board-display' ) !== null ) {
-		document.querySelector( '#board-display' ).addEventListener( 'submit', ( event2 ) => {
+	if ( document.querySelector( '.container' ) !== null ) {
+		document.querySelector( '.container' ).addEventListener( 'submit', ( event2 ) => {
 			if ( event2.target.closest( '.board-form' ) ) {
 				event2.preventDefault();
 
@@ -124,9 +89,15 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 						// console.log( error );
 					}
 
-					if ( url.toLowerCase().includes( 'api/replies' ) && method == 'POST' ) {
+					if ( event2.target.closest( '.board-form' ).querySelector( 'input[type="submit"]' ).value == 'Add thread' ) {
+						event2.target.reset();
 						load_thread_data();
-						window.scrollTo( { 'top': 0, 'left': 0, 'behavior': 'smooth' } );
+					} else if ( url.toLowerCase().includes( 'api/replies' ) && method == 'POST' ) {
+						load_thread_data();
+
+						if ( thread !== undefined ) {
+							window.scrollTo( { 'top': 0, 'left': 0, 'behavior': 'smooth' } );
+						}
 					} else if ( event2.submitter.value.toLowerCase().includes( 'delete' ) && method == 'DELETE' && data['result'] !== undefined && data['result'] == 'Successfully deleted' ) {
 						alert( data['error'] !== undefined ? data['error'] : data['result'] );
 						load_thread_data();
@@ -222,7 +193,7 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 									<input type="hidden" name="thread_id" value="${thread['id']}">
 									<textarea class="form-control mb-2" rows="5" cols="80" name="text" placeholder="Quick reply..." required></textarea>
 									<input class="form-control mb-2" type="text" name="delete_password" placeholder="Password to delete" autocomplete="off" required>
-									<input class="btn btn-primary" type="submit" value="Submit">
+									<input class="btn btn-primary" type="submit" value="Add reply">
 								</form>
 							</div>
 						</div>

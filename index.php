@@ -752,12 +752,12 @@ function delete_reply( $thread_id, $reply_id, $delete_password ) {
 					<?php } elseif ( ! empty( $board ) ) { ?>
 						<h2 id="board-title" class="text-center"></h2>
 
-						<div id="add-new-thread" class="mb-3">
+						<div class="mb-3">
 							<h3>Add a new thread:</h3>
-							<form id="new-thread" class="text-center" action="<?php echo $path_prefix; ?>api/threads/<?php echo $board; ?>" method="post">
+							<form class="board-form text-center" action="<?php echo $path_prefix; ?>api/threads/<?php echo $board; ?>" method="post">
 								<textarea class="form-control mb-2" rows="8" cols="120" name="text" placeholder="Thread text..." required></textarea>
 								<input class="form-control mb-2" type="text" name="delete_password" placeholder="Password to delete" autocomplete="off" required>
-								<input class="btn btn-primary" type="submit" value="Submit">
+								<input class="btn btn-primary" type="submit" value="Add thread">
 							</form>
 						</div>
 
